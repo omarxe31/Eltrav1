@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+
 jobs:
   build:
     runs-on: windows-latest
@@ -24,8 +25,8 @@ jobs:
       - name: Configure Project with CMake
         run: cmake -B build -S . -DJUCE_BUILD_EXAMPLES=OFF -DJUCE_BUILD_EXTRAS=OFF -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build Project
-        run: cmake --build build --config Release
+      - name: Build Project (Verbose)
+        run: cmake --build build --config Release --verbose
 
       - name: Upload VST3 Artifact
         uses: actions/upload-artifact@v4
