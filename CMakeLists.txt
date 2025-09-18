@@ -13,6 +13,7 @@ if(NOT EXISTS "${CMAKE_SOURCE_DIR}/JUCE")
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 
+# إضافة JUCE
 add_subdirectory(JUCE)
 
 # تعريف البلوجن
@@ -30,6 +31,9 @@ target_sources(EltraV1 PRIVATE
     PluginEditor.cpp
 )
 
+# توليد JuceHeader.h تلقائي
+juce_generate_juce_header(EltraV1)
+
 # إعدادات JUCE
 target_compile_definitions(EltraV1 PRIVATE
     JUCE_WEB_BROWSER=0
@@ -38,4 +42,9 @@ target_compile_definitions(EltraV1 PRIVATE
 )
 
 # اللينك مع JUCE
-target_link_libraries(EltraV1 PRIVATE juce::juce_audio_utils)
+target_link_libraries(EltraV1 PRIVATE
+    juce::juce_audio_utils
+    juce::juce_audio_processors
+    juce::juce_audio_basics
+    juce::juce_core
+)
