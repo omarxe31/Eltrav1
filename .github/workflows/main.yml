@@ -28,8 +28,12 @@ jobs:
       - name: Build project
         run: cmake --build build --config Release --target ALL_BUILD
 
+      # خطوة للتأكد من مكان الملفات بعد الـ build
+      - name: List built files
+        run: dir build /s
+
       - name: Upload VST3 artifact
         uses: actions/upload-artifact@v4
         with:
           name: EltraV1_VST3
-          path: build/Release/*.vst3
+          path: build/**/*.vst3   # يلتقط أي ملف .vst3 جوه أي مجلد داخل build
