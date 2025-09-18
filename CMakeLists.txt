@@ -13,7 +13,11 @@ if(NOT EXISTS "${CMAKE_SOURCE_DIR}/JUCE")
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 
+# إضافة JUCE
 add_subdirectory(JUCE)
+
+# تضمين مجلدات JUCE
+include_directories(${CMAKE_SOURCE_DIR}/JUCE/modules)
 
 # تعريف البلوجن
 juce_add_plugin(EltraV1
@@ -37,8 +41,17 @@ target_compile_definitions(EltraV1 PRIVATE
     JUCE_VST3_CAN_REPLACE_VST2=0
 )
 
-# اللينك مع مكتبات JUCE اللازمة
+# اللينك مع JUCE
 target_link_libraries(EltraV1 PRIVATE
     juce::juce_audio_utils
-    juce::juce_dsp
+    juce::juce_audio_processors
+    juce::juce_audio_formats
+    juce::juce_audio_devices
+    juce::juce_core
+    juce::juce_graphics
+    juce::juce_gui_basics
+    juce::juce_gui_extra
 )
+
+# إنشاء JuceHeader.h تلقائياً
+juce_generate_juce_header(EltraV1)
