@@ -30,7 +30,7 @@ jobs:
 
       # خطوة للتأكد من مكان الملفات بعد الـ build
       - name: List built files
-        run: dir build /s
+        run: Get-ChildItem -Recurse build
 
       - name: Upload VST3 artifact
         uses: actions/upload-artifact@v4
