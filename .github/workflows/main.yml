@@ -2,36 +2,34 @@ name: Build VST3 Plugin
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Install CMake
-      uses: jwlawson/actions-setup-cmake@v1
-      with:
-        cmake-version: '3.27.0'
+      - name: Set up MSVC
+        uses: microsoft/setup-msbuild@v2
 
-    - name: Install JUCE
-      run: |
-        git clone --branch 7.0.12 https://github.com/juce-framework/JUCE.git
-        echo "JUCE path: ${{ github.workspace }}/JUCE"
+      - name: Install CMake
+        uses: lukka/get-cmake@v3.29.2
 
-    - name: Configure project with CMake
-      run: |
-        cmake -Bbuild -S. -DJUCE_DIR="${{ github.workspace }}/JUCE"
+      - name: Configure Project with CMake
+        run: cmake -B build -S Eltrav1 -DJUCE_BUILD_EXAMPLES=OFF -DJUCE_BUILD_EXTRAS=OFF -DCMAKE_BUILD_TYPE=Release
 
-    - name: Build project
-      run: cmake --build build --config Release
+      - name: Build Project
+        run: cmake --build build --config Release
 
-    - name: Upload VST3 Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: EltraV1-vst3
-        path: build/**/*.vst3
+      - name: Upload VST3 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Eltrav1-VST3
+          path: build/**/Eltrav1.vst3
