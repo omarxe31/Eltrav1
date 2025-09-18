@@ -31,7 +31,7 @@ jobs:
       run: cmake --build build --config Release
 
     - name: Upload VST3 Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: EltraV1-vst3
         path: build/**/*.vst3
