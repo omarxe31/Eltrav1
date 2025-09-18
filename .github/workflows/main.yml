@@ -11,28 +11,25 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up MSVC
-        uses: microsoft/setup-msbuild@v2
-
       - name: Install CMake
-        uses: lukka/get-cmake@v3.29.2
+        uses: lukka/get-cmake@latest
 
-      - name: Download JUCE
-        run: git clone --depth 1 https://github.com/juce-framework/JUCE.git
+      - name: Install JUCE
+        run: |
+          git clone --depth 1 https://github.com/juce-framework/JUCE.git
 
-      - name: Configure Project with CMake
-        run: cmake -B build -S . -DJUCE_BUILD_EXAMPLES=OFF -DJUCE_BUILD_EXTRAS=OFF -DCMAKE_BUILD_TYPE=Release -DJUCE_DIR=JUCE
+      - name: Configure project
+        run: cmake -B build -S . -DJUCE_BUILD_EXAMPLES=OFF -DJUCE_BUILD_EXTRAS=OFF -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build Project (Verbose)
-        run: cmake --build build --config Release --verbose
+      - name: Build project
+        run: cmake --build build --config Release --target ALL_BUILD
 
-      - name: Upload VST3 Artifact
+      - name: Upload VST3 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Eltrav1-VST3
-          path: build/**/Eltrav1.vst3
+          name: EltraV1_VST3
+          path: build/Release/*.vst3
