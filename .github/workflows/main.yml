@@ -23,7 +23,7 @@ jobs:
         uses: lukka/get-cmake@v3.29.2
 
       - name: Configure Project with CMake
-        run: cmake -B build -S Eltrav1 -DJUCE_BUILD_EXAMPLES=OFF -DJUCE_BUILD_EXTRAS=OFF -DCMAKE_BUILD_TYPE=Release
+        run: cmake -B build -S . -DJUCE_BUILD_EXAMPLES=OFF -DJUCE_BUILD_EXTRAS=OFF -DCMAKE_BUILD_TYPE=Release
 
       - name: Build Project
         run: cmake --build build --config Release
