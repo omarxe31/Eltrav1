@@ -22,8 +22,11 @@ jobs:
       - name: Install CMake
         uses: lukka/get-cmake@v3.29.2
 
+      - name: Download JUCE
+        run: git clone --depth 1 https://github.com/juce-framework/JUCE.git
+
       - name: Configure Project with CMake
-        run: cmake -B build -S . -DJUCE_BUILD_EXAMPLES=OFF -DJUCE_BUILD_EXTRAS=OFF -DCMAKE_BUILD_TYPE=Release
+        run: cmake -B build -S . -DJUCE_BUILD_EXAMPLES=OFF -DJUCE_BUILD_EXTRAS=OFF -DCMAKE_BUILD_TYPE=Release -DJUCE_DIR=JUCE
 
       - name: Build Project (Verbose)
         run: cmake --build build --config Release --verbose
