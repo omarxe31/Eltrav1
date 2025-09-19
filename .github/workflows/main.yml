@@ -12,28 +12,36 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
+      # تحميل الريبو
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # تثبيت CMake
       - name: Install CMake
         uses: lukka/get-cmake@latest
 
+      # تحميل JUCE داخل فولدر المشروع
       - name: Install JUCE
         run: |
-          git clone --depth 1 https://github.com/juce-framework/JUCE.git
+          if (-Not (Test-Path JUCE)) {
+            git clone --depth 1 --branch 7.0.12 https://github.com/juce-framework/JUCE.git
+          }
 
+      # تهيئة المشروع
       - name: Configure project
         run: cmake -B build -S . -DJUCE_BUILD_EXAMPLES=OFF -DJUCE_BUILD_EXTRAS=OFF -DCMAKE_BUILD_TYPE=Release
 
+      # البناء
       - name: Build project
         run: cmake --build build --config Release --target ALL_BUILD
 
-      # خطوة للتأكد من مكان الملفات بعد الـ build
+      # عرض الملفات بعد البناء
       - name: List built files
         run: Get-ChildItem -Recurse build
 
+      # رفع ملف الـ VST3 النهائي
       - name: Upload VST3 artifact
         uses: actions/upload-artifact@v4
         with:
           name: EltraV1_VST3
-          path: build/**/*.vst3   # يلتقط أي ملف .vst3 جوه أي مجلد داخل build
+          path: build/**/*.vst3
