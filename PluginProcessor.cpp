@@ -2,34 +2,32 @@
 #include "PluginEditor.h"
 
 EltraV1AudioProcessor::EltraV1AudioProcessor()
-    : parameters(*this, nullptr, "PARAMS", {
-        std::make_unique<juce::AudioParameterFloat>("roomSize", "Room Size", 0.0f, 1.0f, 0.5f),
-        std::make_unique<juce::AudioParameterFloat>("damping",  "Damping",   0.0f, 1.0f, 0.5f),
-        std::make_unique<juce::AudioParameterFloat>("width",    "Width",     0.0f, 1.0f, 1.0f),
-        std::make_unique<juce::AudioParameterFloat>("mix",      "Mix",       0.0f, 1.0f, 0.5f)
-    })
-{}
-
-void EltraV1AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+    : AudioProcessor(BusesProperties().withInput("Input", juce::AudioChannelSet::stereo(), true)
+                                     .withOutput("Output", juce::AudioChannelSet::stereo(), true))
 {
-    reverb.setSampleRate(sampleRate);
+    reverbParams.roomSize = 0.7f;
+    reverbParams.damping = 0.5f;
+    reverbParams.wetLevel = 0.6f;
+    reverbParams.dryLevel = 0.5f;
+    reverbParams.width = 1.0f;
+    reverb.setParameters(reverbParams);
 }
 
-void EltraV1AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
+void EltraV1AudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    reverbParams.roomSize = *parameters.getRawParameterValue("roomSize");
-    reverbParams.damping  = *parameters.getRawParameterValue("damping");
-    reverbParams.width    = *parameters.getRawParameterValue("width");
-    reverbParams.wetLevel = *parameters.getRawParameterValue("mix");
-    reverbParams.dryLevel = 1.0f - reverbParams.wetLevel;
-    
-    reverb.setParameters(reverbParams);
+    juce::dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+    reverb.prepare(spec);
+}
 
-    for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
-        reverb.processMono(buffer.getWritePointer(channel), buffer.getNumSamples());
+void EltraV1AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
+{
+    juce::dsp::AudioBlock<float> block(buffer);
+    reverb.process(juce::dsp::ProcessContextReplacing<float>(block));
 }
 
 juce::AudioProcessorEditor* EltraV1AudioProcessor::createEditor()
 {
-    return new EltraV1AudioProcessorEditor (*this);
-}
+    return new EltraV1AudioProcessorEditor(*this);
