@@ -3,50 +3,33 @@
 
 EltraV1AudioProcessor::EltraV1AudioProcessor()
     : parameters(*this, nullptr, "PARAMETERS",
-                 { std::make_unique<juce::AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.5f) })
+        { std::make_unique<juce::AudioParameterFloat>("roomSize", "Room Size", 0.0f, 1.0f, 0.5f),
+          std::make_unique<juce::AudioParameterFloat>("damping", "Damping", 0.0f, 1.0f, 0.5f),
+          std::make_unique<juce::AudioParameterFloat>("width", "Width", 0.0f, 1.0f, 1.0f),
+          std::make_unique<juce::AudioParameterFloat>("mix", "Mix", 0.0f, 1.0f, 0.5f) })
 {
 }
 
-EltraV1AudioProcessor::~EltraV1AudioProcessor() {}
-
-const juce::String EltraV1AudioProcessor::getName() const { return "EltraV1"; }
-
-bool EltraV1AudioProcessor::acceptsMidi() const { return false; }
-bool EltraV1AudioProcessor::producesMidi() const { return false; }
-bool EltraV1AudioProcessor::isMidiEffect() const { return false; }
-double EltraV1AudioProcessor::getTailLengthSeconds() const { return 0.0; }
-
-int EltraV1AudioProcessor::getNumPrograms() { return 1; }
-int EltraV1AudioProcessor::getCurrentProgram() { return 0; }
-void EltraV1AudioProcessor::setCurrentProgram (int) {}
-const juce::String EltraV1AudioProcessor::getProgramName (int) { return {}; }
-void EltraV1AudioProcessor::changeProgramName (int, const juce::String&) {}
-
-void EltraV1AudioProcessor::prepareToPlay (double, int) {}
-void EltraV1AudioProcessor::releaseResources() {}
-
-bool EltraV1AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+void EltraV1AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    return layouts.getMainOutputChannelSet() == juce::AudioChannelSet::stereo();
+    reverb.setSampleRate(sampleRate);
 }
 
 void EltraV1AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
-    auto gain = *parameters.getRawParameterValue("gain");
-    buffer.applyGain(gain);
+    buffer.clear();
+
+    reverbParams.roomSize   = *parameters.getRawParameterValue("roomSize");
+    reverbParams.damping    = *parameters.getRawParameterValue("damping");
+    reverbParams.width      = *parameters.getRawParameterValue("width");
+    reverbParams.wetLevel   = *parameters.getRawParameterValue("mix");
+    reverbParams.dryLevel   = 1.0f - reverbParams.wetLevel;
+    reverbParams.freezeMode = 0.0f;
+
+    reverb.setParameters(reverbParams);
+    reverb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
 }
 
-bool EltraV1AudioProcessor::hasEditor() const { return true; }
-juce::AudioProcessorEditor* EltraV1AudioProcessor::createEditor() { return new EltraV1AudioProcessorEditor(*this); }
+juce::AudioProcessorEditor* EltraV1AudioProcessor::createEditor() { return new juce::GenericAudioProcessorEditor (*this); }
 
-void EltraV1AudioProcessor::getStateInformation (juce::MemoryBlock& destData)
-{
-    juce::MemoryOutputStream stream(destData, true);
-    parameters.state.writeToStream(stream);
-}
-
-void EltraV1AudioProcessor::setStateInformation (const void* data, int sizeInBytes)
-{
-    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
-    if (tree.isValid()) parameters.state = tree;
-}
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new EltraV1AudioProcessor(); }
