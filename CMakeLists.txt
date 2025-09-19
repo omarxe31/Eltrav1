@@ -37,6 +37,3 @@ target_link_libraries(EltraV1 PRIVATE
     juce::juce_gui_extra
     juce::juce_dsp
 )
-
-# نسخ البلوجن بعد البناء
-juce_add_binary_data(EltraV1Data SOURCES)
