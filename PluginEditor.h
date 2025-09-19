@@ -12,24 +12,10 @@ public:
     void resized() override;
 
 private:
-    EltraV1AudioProcessor& processorRef;
-
-    juce::Slider mixSlider;
-    juce::Slider decaySlider;
-    juce::Slider preDelaySlider;
-    juce::Slider toneSlider;
-
-    juce::ToggleButton softHardButton;
-    juce::ToggleButton lightDarkButton;
-
-    using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
-    using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
-
-    std::unique_ptr<SliderAttachment> mixAttachment;
-    std::unique_ptr<SliderAttachment> decayAttachment;
-    std::unique_ptr<SliderAttachment> preDelayAttachment;
-    std::unique_ptr<SliderAttachment> toneAttachment;
-    std::unique_ptr<ButtonAttachment> softAttachment;
+    EltraV1AudioProcessor& processor;
+    juce::Slider gainSlider;
+    juce::Label gainLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EltraV1AudioProcessorEditor)
 };
