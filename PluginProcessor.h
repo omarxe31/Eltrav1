@@ -15,9 +15,7 @@ public:
     bool hasEditor() const override { return true; }
 
     const juce::String getName() const override { return "EltraV1"; }
-    bool acceptsMidi() const override { return false; }
-    bool producesMidi() const override { return false; }
-    bool isMidiEffect() const override { return false; }
+
     double getTailLengthSeconds() const override { return 0.0; }
 
     int getNumPrograms() override { return 1; }
@@ -29,12 +27,10 @@ public:
     void getStateInformation (juce::MemoryBlock&) override {}
     void setStateInformation (const void*, int) override {}
 
-    // بارامترات الريفيرب
     juce::AudioProcessorValueTreeState parameters;
 
 private:
     juce::Reverb reverb;
     juce::Reverb::Parameters reverbParams;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EltraV1AudioProcessor)
 };
